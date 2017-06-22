@@ -5,13 +5,15 @@
 #include <ctype.h>
 
 static int ind_blk, tab_val, singleqt_str, doubleqt_str, whitespc;
+static char esc_char;
 
-void parser_init(int indent_block, int tab_value, int singlequote_str, int doublequote_str, int whitespace)
+void parser_init(int indent_block, int tab_value, int singlequote_str, int doublequote_str, char escape_character, int whitespace)
 {
     ind_blk = indent_block;
     tab_val = tab_value;
     singleqt_str = singlequote_str;
     doubleqt_str = doublequote_str;
+    esc_char = escape_character;
     whitespc = whitespace;
 }
 
@@ -130,11 +132,25 @@ void tokenize(char ***token_set, const char *token_str, const char *error, const
                 token_loc++;
                 token_str_loc++;
             }
-        } else if (ispunct(*(token_str + token_str_loc))) {
+        } else if (ispunct(*(token_str + token_str_loc)) || (*(token_str + token_str_loc) != '\'' && !singleqt_str) || (*(token_str + token_str_loc) != '\"') && !doubleqt_str) {
             token = (char *) realloc(token, sizeof(char) * (token_loc + 2));
             *(token + token_loc) = *(token_str + token_str_loc);
             token_loc++;
             token_str_loc++;
+        } else if (*(token_str + token_str_loc) == '\'') {
+            while (*(token_str + token_str_loc) != '\'' && *(token_str + token_str_loc - 1) != esc_char) {
+                token = (char *) realloc(token, sizeof(char) * (token_loc + 2));
+                *(token + token_loc) = *(token_str + token_str_loc);
+                token_loc++;
+                token_str_loc++;
+            }
+        } else if (*(token_str + token_str_loc) == '\"') {
+            while (*(token_str + token_str_loc) != '\"' && *(token_str + token_str_loc - 1) != esc_char) {
+                token = (char *) realloc(token, sizeof(char) * (token_loc + 2));
+                *(token + token_loc) = *(token_str + token_str_loc);
+                token_loc++;
+                token_str_loc++;
+            }
         }
 
         if (strcmp(token, "")) {

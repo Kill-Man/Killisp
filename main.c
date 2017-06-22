@@ -1,5 +1,3 @@
-// breaks on "-aeuimebunhidaueitthia" ?
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,7 +6,7 @@
 
 const int MAJOR_VERSION = 0;
 const int MINOR_VERSION = 0;
-const int PATCH_VERSION = 1;
+const int PATCH_VERSION = 2;
 
 int main(int argc, char **argv)
 {

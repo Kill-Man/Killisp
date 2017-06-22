@@ -6,8 +6,9 @@
 /// tab_value: If greater than zero, all tab characters are converted to tab_value ammount of spaces. If zero, a tab is read as a tab. If a less than zero, tabs are ignored. Ignored if indent_block and whitespace are both 0.
 /// singlequote_str: Non-zero value means that a single quote represents the start and end of a character or string.
 /// doublequote_str: Non-zero value means that a double quote represents the start and end of a character or string.
+/// escape_character: Character that will be used as escape in strings.
 /// whitespace: Non-zero value means that whitespace is put into it's own block.
-void parser_init(int indent_block, int tab_value, int singlequote_str, int doublequote_str, int whitespace);
+void parser_init(int indent_block, int tab_value, int singlequote_str, int doublequote_str, char escape_character, int whitespace);
 
 /* !!!!!DO LATER (AFTER DONE WITH LANGUAGE)!!!!!
 /// Splits a single string with multiple newlines into a set of single lines.
