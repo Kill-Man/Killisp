@@ -83,19 +83,19 @@ void tokenize(char ***token_set, const char *token_str, const char *error, const
     int i;
     for (i = 0; ; i++) {
         if (*(*token_set + i) == NULL) {
-            puts("It knows it's null.");
-            printf("*(*token_set + i) = %-20s", *(*token_set + i));
-            printf("aa");
+            // puts("It knows it's null.");
+            // printf("*(*token_set + i) = %-20s", *(*token_set + i));
+            // printf("aa");
             free(*(*token_set + i));
-            printf("b\n");
+            // printf("b\n");
             break;
         } else {
-            printf("*(*token_set + i) = %-20s", *(*token_set + i));
-            printf("ba");
+            // printf("*(*token_set + i) = %-20s", *(*token_set + i));
+            // printf("ba");
             free(*(*token_set + i));
-            printf("b");
+            // printf("b");
         }
-        printf("\n");
+        // printf("\n");
     }
     free(*token_set);
     *token_set = (char **) malloc (sizeof(char *));
@@ -147,11 +147,12 @@ void tokenize(char ***token_set, const char *token_str, const char *error, const
 
         if (strcmp(token, "")) {
             *(token + token_loc) = '\0';
+            *token_set = (char **) realloc(*token_set, sizeof(char *) * (current_token + 2));
             *(*token_set + current_token) = (char *) malloc(sizeof(char) * strlen(token));
             strcpy(*(*token_set + current_token), token);
             token_loc = 0;
             current_token++;
-            printf("Token: %s\n", token);
+            // printf("Token: %s\n", token);
             // free(token);
             // whole block used to be under if / else ifs right above
         }
