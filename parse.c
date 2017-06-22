@@ -97,7 +97,7 @@ void tokenize(char ***token_set, const char *token_str, const char *error, const
     int token_loc = 0; // int to know where in token the parser is
     int current_token = 0; // int to know where in token_set to store the value of *token
     int token_str_loc = 0; // int to know where in token_str the parser is
-    char in_string = 0; // char to know if in string
+    // char in_string = 0; // char to know if in string
 
     if (ind_blk || whitespc) {
         // do later
@@ -132,20 +132,34 @@ void tokenize(char ***token_set, const char *token_str, const char *error, const
                 token_loc++;
                 token_str_loc++;
             }
-        } else if (ispunct(*(token_str + token_str_loc)) || (*(token_str + token_str_loc) != '\'' && !singleqt_str) || (*(token_str + token_str_loc) != '\"') && !doubleqt_str) {
+        } else if (ispunct(*(token_str + token_str_loc)) && *(token_str + token_str_loc) != '\'' && *(token_str + token_str_loc) != '\"') {
             token = (char *) realloc(token, sizeof(char) * (token_loc + 2));
             *(token + token_loc) = *(token_str + token_str_loc);
             token_loc++;
             token_str_loc++;
         } else if (*(token_str + token_str_loc) == '\'') {
-            while (*(token_str + token_str_loc) != '\'' && *(token_str + token_str_loc - 1) != esc_char) {
+            if (singleqt_str) {
+                while (!(*(token_str + token_str_loc - 1) == '\'' && *(token_str + token_str_loc - 2) == esc_char)) {
+                    token = (char *) realloc(token, sizeof(char) * (token_loc + 2));
+                    *(token + token_loc) = *(token_str + token_str_loc);
+                    token_loc++;
+                    token_str_loc++;
+                }
+            } else {
                 token = (char *) realloc(token, sizeof(char) * (token_loc + 2));
                 *(token + token_loc) = *(token_str + token_str_loc);
                 token_loc++;
                 token_str_loc++;
             }
         } else if (*(token_str + token_str_loc) == '\"') {
-            while (*(token_str + token_str_loc) != '\"' && *(token_str + token_str_loc - 1) != esc_char) {
+            if (doubleqt_str) {
+                while (!(*(token_str + token_str_loc - 1) == '\"' && *(token_str + token_str_loc - 2) == esc_char)) {
+                    token = (char *) realloc(token, sizeof(char) * (token_loc + 2));
+                    *(token + token_loc) = *(token_str + token_str_loc);
+                    token_loc++;
+                    token_str_loc++;
+                }
+            } else {
                 token = (char *) realloc(token, sizeof(char) * (token_loc + 2));
                 *(token + token_loc) = *(token_str + token_str_loc);
                 token_loc++;
