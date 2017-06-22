@@ -83,19 +83,11 @@ void tokenize(char ***token_set, const char *token_str, const char *error, const
     int i;
     for (i = 0; ; i++) {
         if (*(*token_set + i) == NULL) {
-            // puts("It knows it's null.");
-            // printf("*(*token_set + i) = %-20s", *(*token_set + i));
-            // printf("aa");
             free(*(*token_set + i));
-            // printf("b\n");
             break;
         } else {
-            // printf("*(*token_set + i) = %-20s", *(*token_set + i));
-            // printf("ba");
             free(*(*token_set + i));
-            // printf("b");
         }
-        // printf("\n");
     }
     free(*token_set);
     *token_set = (char **) malloc (sizeof(char *));
@@ -152,9 +144,6 @@ void tokenize(char ***token_set, const char *token_str, const char *error, const
             strcpy(*(*token_set + current_token), token);
             token_loc = 0;
             current_token++;
-            // printf("Token: %s\n", token);
-            // free(token);
-            // whole block used to be under if / else ifs right above
         }
     }
     *(*token_set + current_token) = (char *) malloc(sizeof(NULL));
