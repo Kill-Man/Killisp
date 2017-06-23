@@ -97,7 +97,28 @@ void tokenize(char ***token_set, const char *token_str, const char *error, const
     int token_loc = 0; // int to know where in token the parser is
     int current_token = 0; // int to know where in token_set to store the value of *token
     int token_str_loc = 0; // int to know where in token_str the parser is
-    // char in_string = 0; // char to know if in string
+    char in_sqstring, in_dqstring; // chars to know if in string
+    in_sqstring = in_dqstring = 0;
+    int squote_amnt, dquote_amnt;
+    squote_amnt = dquote_amnt = 0;
+    int num_bs = 0; // holds number of backslashes in a row before quote (if even, quote ends)
+    for (i = 0; i < strlen(token_str); i++) {
+        if (*(token_str + i) == esc_char) {
+            num_bs++;
+        } else {
+            num_bs = 0;
+        }
+        if ((*(token_str + i) == '\'' && !in_dqstring && !(i > 0 && *(token_str + i - 1) == esc_char)) || (num_bs % 2 == 0 && num_bs > 1)) {
+            squote_amnt++;
+        } else if ((*(token_str + i) == '\"' && !in_sqstring && !(i > 0 && *(token_str + i - 1) == esc_char)) || (num_bs % 2 == 0 && num_bs > 1)) {
+            dquote_amnt++;
+        }
+        in_dqstring = dquote_amnt % 2;
+        in_sqstring = squote_amnt % 2;
+    }
+    char even_sqt, even_dqt;
+    even_sqt = squote_amnt % 2 == 0;
+    even_dqt = dquote_amnt % 2 == 0;
 
     if (ind_blk || whitespc) {
         // do later
@@ -139,11 +160,23 @@ void tokenize(char ***token_set, const char *token_str, const char *error, const
             token_str_loc++;
         } else if (*(token_str + token_str_loc) == '\'') {
             if (singleqt_str) {
-                while (!(*(token_str + token_str_loc - 1) == '\'' && *(token_str + token_str_loc - 2) == esc_char)) {
+                while ((!(*(token_str + token_str_loc) == '\'' && token_loc > 0 && *(token_str + token_str_loc - 1) != esc_char) && squote_amnt != 1) || (num_bs % 2 == 0 && num_bs > 1)) { // > 0 used to be != 1
+                    if (*(token_str + token_str_loc) == esc_char) {
+                        num_bs++;
+                    } else {
+                        num_bs = 0;
+                    }
                     token = (char *) realloc(token, sizeof(char) * (token_loc + 2));
                     *(token + token_loc) = *(token_str + token_str_loc);
                     token_loc++;
                     token_str_loc++;
+                }
+                token = (char *) realloc(token, sizeof(char) * (token_loc + 2));
+                *(token + token_loc) = *(token_str + token_str_loc);
+                token_loc++;
+                token_str_loc++;
+                if (!even_sqt) {
+                    squote_amnt -= 2;
                 }
             } else {
                 token = (char *) realloc(token, sizeof(char) * (token_loc + 2));
@@ -153,11 +186,23 @@ void tokenize(char ***token_set, const char *token_str, const char *error, const
             }
         } else if (*(token_str + token_str_loc) == '\"') {
             if (doubleqt_str) {
-                while (!(*(token_str + token_str_loc - 1) == '\"' && *(token_str + token_str_loc - 2) == esc_char)) {
+                while ((!(*(token_str + token_str_loc) == '\"' && token_loc > 0 && *(token_str + token_str_loc - 1) != esc_char) && dquote_amnt != 1) || (num_bs % 2 == 0 && num_bs > 1)) { // > 0 used to be != 1
+                    if (*(token_str + token_str_loc) == esc_char) {
+                        num_bs++;
+                    } else {
+                        num_bs = 0;
+                    }
                     token = (char *) realloc(token, sizeof(char) * (token_loc + 2));
                     *(token + token_loc) = *(token_str + token_str_loc);
                     token_loc++;
                     token_str_loc++;
+                }
+                token = (char *) realloc(token, sizeof(char) * (token_loc + 2));
+                *(token + token_loc) = *(token_str + token_str_loc);
+                token_loc++;
+                token_str_loc++;
+                if (!even_dqt) {
+                    dquote_amnt -= 2;
                 }
             } else {
                 token = (char *) realloc(token, sizeof(char) * (token_loc + 2));
