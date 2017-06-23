@@ -2,12 +2,12 @@
 #define _PARSE_H_
 
 /// Initializes the parser with information on how to parse the strings given.
-/// indent_block: Non-zero value means that the set of whitespace before any printed characters, if it exists, will be put as it's own token.
-/// tab_value: If greater than zero, all tab characters are converted to tab_value ammount of spaces. If zero, a tab is read as a tab. If a less than zero, tabs are ignored. Ignored if indent_block and whitespace are both 0.
-/// singlequote_str: Non-zero value means that a single quote represents the start and end of a character or string and entire string will be stored as a single token.
-/// doublequote_str: Non-zero value means that a double quote represents the start and end of a character or string and entire string will be stored as a single token.
+/// indent_block: !0 = the set of whitespace before any printed characters, if it exists, will be put as it's own token.
+/// tab_value: >0 = all tab characters are converted to tab_value ammount of spaces. 0 = a tab is read as a tab. <0 = tabs are ignored. Ignored if indent_block and whitespace are both 0.
+/// singlequote_str: !0 = single quote represents the start and end of a character or string and entire string will be stored as a single token.
+/// doublequote_str: !0 = double quote represents the start and end of a character or string and entire string will be stored as a single token.
 /// escape_character: Character that will be used as escape in strings.
-/// whitespace: Non-zero value means that whitespace is put into it's own block.
+/// whitespace: !0 = whitespace is put into it's own block.
 void parser_init(int indent_block, int tab_value, int singlequote_str, int doublequote_str, char escape_character, int whitespace);
 
 /* !!!!!DO LATER (AFTER DONE WITH LANGUAGE)!!!!!
