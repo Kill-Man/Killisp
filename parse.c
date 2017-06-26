@@ -83,6 +83,8 @@ void div_indiv_lines(char ***indiv_lines, const char *string, const char *error,
 void tokenize(char ***token_set, const char *token_str, const char *error, const int error_code)
 {
     int i;
+
+    // freeing token_set
     for (i = 0; ; i++) {
         if (*(*token_set + i) == NULL) {
             free(*(*token_set + i));
@@ -92,34 +94,47 @@ void tokenize(char ***token_set, const char *token_str, const char *error, const
         }
     }
     free(*token_set);
+
+    // allocating token_set
     *token_set = (char **) malloc (sizeof(char *));
+
+    // allocating token
     char *token = (char *) malloc(sizeof(char)); // string to store current token
+
+    // position variables
     int token_loc = 0; // int to know where in token the parser is
     int current_token = 0; // int to know where in token_set to store the value of *token
     int token_str_loc = 0; // int to know where in token_str the parser is
+
+    // count non-escaped quotes in string
     char in_sqstring, in_dqstring; // chars to know if in string
     in_sqstring = in_dqstring = 0;
     int squote_amnt, dquote_amnt;
     squote_amnt = dquote_amnt = 0;
-    int num_bs = 0; // holds number of backslashes in a row before quote (if even, quote ends)
+    int num_esc = 0; // holds number of esc in a row before quote (if even, quote ends)
+    int num_esc_temp;
     for (i = 0; i < strlen(token_str); i++) {
         if (*(token_str + i) == esc_char) {
-            num_bs++;
+            num_esc++;
+            num_esc_temp = num_esc;
         } else {
-            num_bs = 0;
+            num_esc_temp = num_esc;
+            num_esc = 0;
         }
-        if ((*(token_str + i) == '\'' && !in_dqstring && !(i > 0 && *(token_str + i - 1) == esc_char)) || (num_bs % 2 == 0 && num_bs > 1)) {
+        if (*(token_str + i) == '\'' && !in_dqstring && num_esc_temp % 2 == 0) {
             squote_amnt++;
-        } else if ((*(token_str + i) == '\"' && !in_sqstring && !(i > 0 && *(token_str + i - 1) == esc_char)) || (num_bs % 2 == 0 && num_bs > 1)) {
+        } else if (*(token_str + i) == '\"' && !in_sqstring && num_esc_temp % 2 == 0) {
             dquote_amnt++;
         }
         in_dqstring = dquote_amnt % 2;
         in_sqstring = squote_amnt % 2;
     }
+    num_esc = 0;
     char even_sqt, even_dqt;
     even_sqt = squote_amnt % 2 == 0;
     even_dqt = dquote_amnt % 2 == 0;
 
+    // code for whitespc testing at beginning of line
     if (ind_blk || whitespc) {
         // do later
     } else { // if all whitespace is ignored
@@ -128,9 +143,13 @@ void tokenize(char ***token_set, const char *token_str, const char *error, const
         }
     }
 
-    while (*(token_str + token_str_loc) != '\0' && *(token_str + token_str_loc) != EOF) {
+    // token loop
+    while (*(token_str + token_str_loc) != '\0' && *(token_str + token_str_loc) != EOF) { // while not the end of the line
+        // get token prepared
         free(token);
         token = (char *) malloc(sizeof(char));
+
+        // code for if whitespc is enabled
         if (whitespc) {
             // do later
         } else {
@@ -139,32 +158,37 @@ void tokenize(char ***token_set, const char *token_str, const char *error, const
             }
         }
 
-        if (isalpha(*(token_str + token_str_loc)) || *(token_str + token_str_loc) == '_') { // if next set of characters starts with a letter
+        // if / else if / else for placing parsed string into token
+        if (isalpha(*(token_str + token_str_loc)) || *(token_str + token_str_loc) == '_') { // if next set of characters starts with a letter or number
             while (isalnum(*(token_str + token_str_loc)) || *(token_str + token_str_loc) == '_') {
                 token = (char *) realloc(token, sizeof(char) * (token_loc + 2));
                 *(token + token_loc) = *(token_str + token_str_loc);
                 token_loc++;
                 token_str_loc++;
             }
-        } else if (isdigit(*(token_str + token_str_loc))) {
+        } else if (isdigit(*(token_str + token_str_loc))) { // if next set of characters starts with a number
             while (isdigit(*(token_str + token_str_loc))) {
                 token = (char *) realloc(token, sizeof(char) * (token_loc + 2));
                 *(token + token_loc) = *(token_str + token_str_loc);
                 token_loc++;
                 token_str_loc++;
             }
-        } else if (ispunct(*(token_str + token_str_loc)) && *(token_str + token_str_loc) != '\'' && *(token_str + token_str_loc) != '\"') {
+        } else if (ispunct(*(token_str + token_str_loc)) && *(token_str + token_str_loc) != '\'' && *(token_str + token_str_loc) != '\"') { // if next character is a non-quote symbol
             token = (char *) realloc(token, sizeof(char) * (token_loc + 2));
             *(token + token_loc) = *(token_str + token_str_loc);
             token_loc++;
             token_str_loc++;
-        } else if (*(token_str + token_str_loc) == '\'') {
-            if (singleqt_str) {
-                while ((!(*(token_str + token_str_loc) == '\'' && token_loc > 0 && *(token_str + token_str_loc - 1) != esc_char) && squote_amnt != 1) || (num_bs % 2 == 0 && num_bs > 1)) { // > 0 used to be != 1
+        } else if (*(token_str + token_str_loc) == '\'') { // if next character is a single quote
+            if (singleqt_str && squote_amnt != 1) { // if single quotes start and end a string
+                token = (char *) realloc(token, sizeof(char) * (token_loc + 2));
+                *(token + token_loc) = *(token_str + token_str_loc);
+                token_loc++;
+                token_str_loc++;
+                while (!(*(token_str + token_str_loc) == '\'' && num_esc % 2 == 0)) {
                     if (*(token_str + token_str_loc) == esc_char) {
-                        num_bs++;
+                        num_esc++;
                     } else {
-                        num_bs = 0;
+                        num_esc = 0;
                     }
                     token = (char *) realloc(token, sizeof(char) * (token_loc + 2));
                     *(token + token_loc) = *(token_str + token_str_loc);
@@ -178,19 +202,23 @@ void tokenize(char ***token_set, const char *token_str, const char *error, const
                 if (!even_sqt) {
                     squote_amnt -= 2;
                 }
-            } else {
+            } else { // if single quotes don't start and end a string put as single token in token
                 token = (char *) realloc(token, sizeof(char) * (token_loc + 2));
                 *(token + token_loc) = *(token_str + token_str_loc);
                 token_loc++;
                 token_str_loc++;
             }
-        } else if (*(token_str + token_str_loc) == '\"') {
-            if (doubleqt_str) {
-                while ((!(*(token_str + token_str_loc) == '\"' && token_loc > 0 && *(token_str + token_str_loc - 1) != esc_char) && dquote_amnt != 1) || (num_bs % 2 == 0 && num_bs > 1)) { // > 0 used to be != 1
+        } else if (*(token_str + token_str_loc) == '\"') { // if next character is a double quote
+            if (doubleqt_str && dquote_amnt != 1) { // if double quotes start and end a string
+                token = (char *) realloc(token, sizeof(char) * (token_loc + 2));
+                *(token + token_loc) = *(token_str + token_str_loc);
+                token_loc++;
+                token_str_loc++;
+                while (!(*(token_str + token_str_loc) == '\"' && num_esc % 2 == 0)) {
                     if (*(token_str + token_str_loc) == esc_char) {
-                        num_bs++;
+                        num_esc++;
                     } else {
-                        num_bs = 0;
+                        num_esc = 0;
                     }
                     token = (char *) realloc(token, sizeof(char) * (token_loc + 2));
                     *(token + token_loc) = *(token_str + token_str_loc);
@@ -204,7 +232,7 @@ void tokenize(char ***token_set, const char *token_str, const char *error, const
                 if (!even_dqt) {
                     dquote_amnt -= 2;
                 }
-            } else {
+            } else { // if double quotes don't start and end a string put as single token in token
                 token = (char *) realloc(token, sizeof(char) * (token_loc + 2));
                 *(token + token_loc) = *(token_str + token_str_loc);
                 token_loc++;
@@ -212,13 +240,13 @@ void tokenize(char ***token_set, const char *token_str, const char *error, const
             }
         }
 
-        if (strcmp(token, "")) {
-            *(token + token_loc) = '\0';
-            *token_set = (char **) realloc(*token_set, sizeof(char *) * (current_token + 2));
-            *(*token_set + current_token) = (char *) malloc(sizeof(char) * strlen(token));
-            strcpy(*(*token_set + current_token), token);
-            token_loc = 0;
-            current_token++;
+        if (strcmp(token, "")) { // if token is not empty
+            *(token + token_loc) = '\0'; // end the current token with a null terminator
+            *token_set = (char **) realloc(*token_set, sizeof(char *) * (current_token + 2)); // allocate one more set of memory in token_set to store token in.
+            *(*token_set + current_token) = (char *) malloc(sizeof(char) * strlen(token)); // allocate the memory for the new token
+            strcpy(*(*token_set + current_token), token); // copy token into token_set in the newly allocated section of memory
+            token_loc = 0; // reset token_loc
+            current_token++; // increase amount of tokens in token_set
         }
     }
     *(*token_set + current_token) = (char *) malloc(sizeof(NULL));
