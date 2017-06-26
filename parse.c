@@ -173,11 +173,6 @@ void tokenize(char ***token_set, const char *token_str, const char *error, const
                 token_loc++;
                 token_str_loc++;
             }
-        } else if (ispunct(*(token_str + token_str_loc)) && *(token_str + token_str_loc) != '\'' && *(token_str + token_str_loc) != '\"') { // if next character is a non-quote symbol
-            token = (char *) realloc(token, sizeof(char) * (token_loc + 2));
-            *(token + token_loc) = *(token_str + token_str_loc);
-            token_loc++;
-            token_str_loc++;
         } else if (*(token_str + token_str_loc) == '\'') { // if next character is a single quote
             if (singleqt_str && squote_amnt != 1) { // if single quotes start and end a string
                 token = (char *) realloc(token, sizeof(char) * (token_loc + 2));
@@ -238,6 +233,11 @@ void tokenize(char ***token_set, const char *token_str, const char *error, const
                 token_loc++;
                 token_str_loc++;
             }
+        } else if (ispunct(*(token_str + token_str_loc))) { // if next character is a non-quote symbol
+            token = (char *) realloc(token, sizeof(char) * (token_loc + 2));
+            *(token + token_loc) = *(token_str + token_str_loc);
+            token_loc++;
+            token_str_loc++;
         }
 
         if (strcmp(token, "")) { // if token is not empty
