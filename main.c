@@ -3,9 +3,7 @@
 #include <string.h>
 #include "dynamic_io.h"
 #include "parse.h"
-
-char *join_str(const char **str_arr, const char *conjoiner);
-int str_arr_len(const char **str_arr);
+#include "strarr.h"
 
 const int MAJOR_VERSION = 0;
 const int MINOR_VERSION = 0;
@@ -13,27 +11,22 @@ const int PATCH_VERSION = 2;
 
 int main(int argc, char **argv)
 {
-    char  *line = (char *) malloc(sizeof(char)); // String to hold the line from a file or input string.
-    char **toks = (char **) malloc(sizeof(char *)); // Array of strings to hold the individual tokens of *line.
+    char  *line       = (char *)  malloc(sizeof(char)); // String to hold the line from a file or input string.
+    char **toks       = (char **) malloc(sizeof(char *)); // Array of strings to hold the individual tokens of *line.
+    char  *joined_str = (char *)  malloc(sizeof(char));
     int i;
     *toks = (char *) malloc(sizeof(char));
     *toks = NULL; // needed in order to use tokenize ??
     printf("Killisp v%d.%d.%d\n", MAJOR_VERSION, MINOR_VERSION, PATCH_VERSION);
     parser_init(0, 8, 1, 1, '\\', 0); // working on mac/win/lin
     do {
-        printf("> ");
+        printf("[]> ");
         dynamic_gets(&line, "FATAL: Error #1: Unable to allocate memory for line. Exiting.", 1); // working on mac/win/lin
         tokenize(&toks, line, "FATAL: Error #2: Unable to allocate memory for token or token_set", 2); // working on mac
-        /*
+        join_str(&joined_str, toks, " ");
         for (i = 0; *(toks + i); i++) {
-            if (!strcmp(*(toks + i), "(")) {
-
-            } else {
-                puts("Error: no opening parens.");
-            }
+            puts(*(toks + i));
         }
-        */
-        printf("str_arr_len: %d\n", str_arr_len(toks));
     } while (strcmp(line, "(exit)")); // While line != "(exit)"
 
     free(line);
@@ -47,18 +40,4 @@ int main(int argc, char **argv)
     }
     free(toks);
     return 0;
-}
-
-char *join_str(const char **str_arr, const char *conjoiner)
-{
-    //char *joined_str = ;
-}
-
-int str_arr_len(const char **str_arr)
-{
-    int i, array_len = 0;
-    for (i = 0; *(str_arr + i) != NULL; i++) {
-        array_len += strlen(*(str_arr + i));
-    }
-    return array_len;
 }
