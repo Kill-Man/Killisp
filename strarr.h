@@ -19,4 +19,7 @@ int count_amnt_str(const char *str, char **str_arr);
 // checks if str appears in str_arr
 int str_in_arr(const char *str, char **str_arr);
 
+// copy substring of src into dest starting from start and ending at end (exclusive)
+void cpy_sub_str(char *dest, const char *src, int start, int end);
+
 #endif // _STRARR_H_

@@ -4,17 +4,18 @@
 #include <string.h>
 #include <ctype.h>
 
-static int ind_blk, tab_val, singleqt_str, doubleqt_str, whitespc;
+static int ind_blk, tab_val, singleqt_str, doubleqt_str, last_qt_str, whitespc;
 static char esc_char;
 
-void parser_init(int indent_block, int tab_value, int singlequote_str, int doublequote_str, char escape_character, int whitespace)
+void parser_init(int indent_block, int tab_value, int singlequote_str, int doublequote_str, char escape_character, int last_quote_str, int whitespace)
 {
-    ind_blk = indent_block;
-    tab_val = tab_value;
+    ind_blk      = indent_block;
+    tab_val      = tab_value;
     singleqt_str = singlequote_str;
     doubleqt_str = doublequote_str;
-    esc_char = escape_character;
-    whitespc = whitespace;
+    esc_char     = escape_character;
+    last_qt_str  = last_quote_str;
+    whitespc     = whitespace;
 }
 
 /* !!!!!DO LATER (AFTER DONE WITH LANGUAGE)!!!!!
@@ -197,6 +198,8 @@ void tokenize(char ***token_set, const char *token_str, const char *error, const
                 if (!even_sqt) {
                     squote_amnt -= 2;
                 }
+            } else if (singleqt_str && squote_amnt == 1 && ) {
+                // DO NOW
             } else { // if single quotes don't start and end a string put as single token in token
                 token = (char *) realloc(token, sizeof(char) * (token_loc + 2));
                 *(token + token_loc) = *(token_str + token_str_loc);
@@ -227,6 +230,8 @@ void tokenize(char ***token_set, const char *token_str, const char *error, const
                 if (!even_dqt) {
                     dquote_amnt -= 2;
                 }
+            } else if (doubleqt_str && dquote_amnt == 1) {
+                // DO NOW
             } else { // if double quotes don't start and end a string put as single token in token
                 token = (char *) realloc(token, sizeof(char) * (token_loc + 2));
                 *(token + token_loc) = *(token_str + token_str_loc);

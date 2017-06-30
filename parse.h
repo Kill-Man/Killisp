@@ -4,11 +4,17 @@
 /// Initializes the parser with information on how to parse the strings given.
 /// indent_block: !0 = the set of whitespace before any printed characters, if it exists, will be put as it's own token.
 /// tab_value: >0 = all tab characters are converted to tab_value amount of spaces. 0 = a tab is read as a tab. <0 = tabs are ignored. Ignored if indent_block and whitespace are both 0.
-/// singlequote_str: !0 = single quote represents the start and end of a character or string and entire string will be stored as a single token. #' % 2 != 0 = last quote stored as token by itself.
-/// doublequote_str: !0 = double quote represents the start and end of a character or string and entire string will be stored as a single token. #" % 2 != 0 = last quote stored as token by itself.
+/// singlequote_str: !0 = single quote represents the start and end of a character or string and entire string will be stored as a single token. #' odd = last quote stored as token by itself.
+/// doublequote_str: !0 = double quote represents the start and end of a character or string and entire string will be stored as a single token. #" odd = last quote stored as token by itself.
 /// escape_character: Character that will be used as escape in strings.
+/// last_quote_str: !0 = if #' || #" odd last quote will be string without ending quote. 0 = odd quote means last quote is in token by itself along with everything after it. Next parse puts everything in a
+//// string until the first quote is met.
+/////// example: !0 = "test" "test" "est => "est
+//////// that" => "est\nthat"
+///////           0 = "test" "test" "est => " est
+//////// that" => " est that "
 /// whitespace: !0 = whitespace is put into it's own block.
-void parser_init(int indent_block, int tab_value, int singlequote_str, int doublequote_str, char escape_character, int whitespace);
+void parser_init(int indent_block, int tab_value, int singlequote_str, int doublequote_str, char escape_character, int last_quote_str, int whitespace);
 
 /* !!!!!DO LATER (AFTER DONE WITH LANGUAGE)!!!!!
 /// Splits a single string with multiple newlines into a set of single lines.
