@@ -8,9 +8,9 @@ enum {
 } datatypes;
 
 typedef union variable {
-    long long long_long;
-    long double long_double;
-    char *char_pointer;
+    long long var_num;
+    long double var_dec;
+    char *var_str;
 } variable;
 
 // puts a datatype variable in key of value.
