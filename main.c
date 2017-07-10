@@ -21,7 +21,7 @@ int main(int argc, char **argv)
     *toks = NULL; // needed in order to use tokenize
     strcpy(missing_chars, "");
     printf("Killisp v%d.%d.%d\n", MAJOR_VERSION, MINOR_VERSION, PATCH_VERSION);
-    parser_init(0, 8, 1, 1, '\\', 0); // working on mac/win/lin
+    parser_init(0, 8, 1, 1, 1, '\\', 1, 0, "0123456789", "_", 1); // working on mac/win/lin
     do {
         printf("[%s]> ", missing_chars);
         dynamic_gets(&line, "FATAL: Error #1: Unable to allocate memory for line. Exiting.", 1); // working on mac/win/lin

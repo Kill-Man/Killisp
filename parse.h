@@ -4,6 +4,7 @@
 /// Initializes the parser with information on how to parse the strings given.
 /// indent_block: !0 = the set of whitespace before any printed characters, if it exists, will be put as it's own token.
 /// tab_value: >0 = all tab characters are converted to tab_value amount of spaces. 0 = a tab is read as a tab. <0 = tabs are ignored. Ignored if indent_block and whitespace are both 0.
+/// num_start_with_dec: !0 = leading periods signal the start of a decimal number. 0 = leading periods go into separate tokens
 /// singlequote_str: !0 = single quote represents the start and end of a character or string and entire string will be stored as a single token. #' odd = last quote stored as token by itself.
 /// doublequote_str: !0 = double quote represents the start and end of a character or string and entire string will be stored as a single token. #" odd = last quote stored as token by itself.
 /// escape_character: Character that will be used as escape in strings.
@@ -14,7 +15,10 @@
 ///////           0 = "test" "test" "est => " est
 //////// that" => " est that "
 /// whitespace: !0 = whitespace is put into it's own block.
-void parser_init(int indent_block, int tab_value, int singlequote_str, int doublequote_str, char escape_character, int last_quote_str, int whitespace);
+/// word_chars: string of characters that will be included in a single token
+/// begin_chars: string of characters that will be able to start a token.
+/// begin_chars_in_word: !0 = begin_chars included in word_chars. 0 = begin_chars not included in word_chars unless directly put in word_chars.
+void parser_init(int indent_block, int tab_value, int num_start_with_dec, int singlequote_str, int doublequote_str, char escape_character, int last_quote_str, int whitespace, char *word_chars, char *begin_chars, int begin_chars_in_word);
 
 /* !!!!!DO LATER (AFTER DONE WITH LANGUAGE)!!!!!
 /// Splits a single string with multiple newlines into a set of single lines.
