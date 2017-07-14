@@ -8,6 +8,7 @@
 /// singlequote_str: !0 = single quote represents the start and end of a character or string and entire string will be stored as a single token. #' odd = last quote stored as token by itself.
 /// doublequote_str: !0 = double quote represents the start and end of a character or string and entire string will be stored as a single token. #" odd = last quote stored as token by itself.
 /// escape_character: Character that will be used as escape in strings.
+/// escape_character_non_string: <0 = escape character escapes characters that aren't in strings and character it precedes is ignored. 0 = escape characters are treated like any other token and put into a separate token. >0 = escape characters and the character they precede are writen as a single token.
 /// last_quote_str: !0 = if #' || #" odd last quote will be string without ending quote. 0 = odd quote means last quote is in token by itself along with everything after it. Next parse puts everything in a
 //// string until the first quote is met.
 /////// example: !0 = "test" "test" "est => "est
@@ -18,7 +19,27 @@
 /// word_chars: string of characters that will be included in a single token
 /// begin_chars: string of characters that will be able to start a token.
 /// begin_chars_in_word: !0 = begin_chars included in word_chars. 0 = begin_chars not included in word_chars unless directly put in word_chars.
-void parser_init(int indent_block, int tab_value, int num_start_with_dec, int singlequote_str, int doublequote_str, char escape_character, int last_quote_str, int whitespace, char *word_chars, char *begin_chars, int begin_chars_in_word);
+/// chars_that_need_beginning_and_end: string that holds characters that need to be ended
+/// ending_chars: string that holds ending chars to counter the chars_that_need_beginning_and_end. must match length of chars_that_need_beginning_and_end
+////// example: chars_that_need_beginning_and_end = "({["; ending_chars = ")}]"; => ["()", "{}", "[]"]
+///////         chars_that_need_beginning_and_end = "({["; ending_chars = "]})"; => ["(]", "{}", "[)"]
+///////         chars_that_need_beginning_and_end = "({["; ending_chars = ")}";  => invalid
+void parser_init(
+    int   indent_block,
+    int   tab_value,
+    int   num_start_with_dec,
+    int   singlequote_str,
+    int   doublequote_str,
+    char  escape_character,
+    int   escape_character_non_string,
+    int   last_quote_str,
+    int   whitespace,
+    char *word_chars,
+    char *begin_chars,
+    int   begin_chars_in_word,
+    char *chars_that_need_beginning_and_end,
+    char *ending_chars
+);
 
 /* !!!!!DO LATER (AFTER DONE WITH LANGUAGE)!!!!!
 /// Splits a single string with multiple newlines into a set of single lines.
@@ -32,6 +53,11 @@ void div_indiv_lines(char ***indiv_lines, const char *string, const char *error,
 /// Splits token_str into individual tokens to be stored dynamically into token_set.
 /// token_set: Set of char * strings to store each individual token. Dynamically Allocated.
 /// token_str: const char * string that will be tokenized.
-void tokenize(char ***token_set, const char *token_str, const char *error, const int error_code);
+int tokenize(char ***token_set, const char *token_str, const char *error, const int error_code);
+
+/// Splits token_str into individual tokens to be appended dynamically into token_set.
+/// token_set: Set of char * strings to store each individual token. Dynamically Allocated.
+/// token_str: const char * string that will be tokenized.
+int tokenize_append(char ***token_set, const char *token_str, const char *error, const int error_code);
 
 #endif // _PARSE_H_

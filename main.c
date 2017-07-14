@@ -21,11 +21,35 @@ int main(int argc, char **argv)
     *toks = NULL; // needed in order to use tokenize
     strcpy(missing_chars, "");
     printf("Killisp v%d.%d.%d\n", MAJOR_VERSION, MINOR_VERSION, PATCH_VERSION);
-    parser_init(0, 8, 1, 1, 1, '\\', 1, 0, "0123456789", "_", 1); // working on mac/win/lin
+    parser_init(
+        0,
+        8,
+        1,
+        1,
+        1,
+        '\\',
+        1,
+        1,
+        0,
+        "0123456789",
+        "_",
+        1,
+        "(",
+        ")"
+    ); // working on mac/win/lin
     do {
-        printf("[%s]> ", missing_chars);
+        printf("[]> ");
         dynamic_gets(&line, "FATAL: Error #1: Unable to allocate memory for line. Exiting.", 1); // working on mac/win/lin
-        tokenize(&toks, line, "FATAL: Error #2: Unable to allocate memory for token or token_set", 2); // working on mac
+        int append_req = tokenize(&toks, line, "FATAL: Error #2: Unable to allocate memory for token or token_set", 2); // working on mac
+        printf("Needs append: %d\n", append_req);
+        ///*
+        while (append_req) {
+            printf("[%s]> ", missing_chars);
+            dynamic_gets(&line, "FATAL: Error #1: Unable to allocate memory for line. Exiting.", 1);
+            append_req = tokenize_append(&toks, line, "FATAL: Error #2: Unable to allocate memory for token or token_set", 2);
+            printf("Needs reappend: %d\n", append_req);
+        }
+        //*/
         for (i = 0; *(toks + i); i++) {
             puts(*(toks + i));
         }
