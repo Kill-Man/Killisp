@@ -42,7 +42,7 @@ int main(int argc, char **argv)
         dynamic_gets(&line, "FATAL: Error #1: Unable to allocate memory for line. Exiting.", 1); // working on mac/win/lin
         int append_req = tokenize(&toks, line, "FATAL: Error #2: Unable to allocate memory for token or token_set", 2); // working on mac
         printf("Needs append: %d\n", append_req);
-        ///*
+        /*
         while (append_req) {
             printf("[%s]> ", missing_chars);
             dynamic_gets(&line, "FATAL: Error #1: Unable to allocate memory for line. Exiting.", 1);

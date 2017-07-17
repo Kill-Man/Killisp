@@ -8,7 +8,7 @@
 /// singlequote_str: !0 = single quote represents the start and end of a character or string and entire string will be stored as a single token. #' odd = last quote stored as token by itself.
 /// doublequote_str: !0 = double quote represents the start and end of a character or string and entire string will be stored as a single token. #" odd = last quote stored as token by itself.
 /// escape_character: Character that will be used as escape in strings.
-/// escape_character_non_string: <0 = escape character escapes characters that aren't in strings and character it precedes is ignored. 0 = escape characters are treated like any other token and put into a separate token. >0 = escape characters and the character they precede are writen as a single token.
+/// escape_character_non_string: <0 = escape character escapes characters that aren't in strings and character it precedes, along with itself, is ignored. 0 = escape characters are treated like any other token and put into a separate token. >0 = escape characters and the character they precede are writen as a single token.
 /// last_quote_str: !0 = if #' || #" odd last quote will be string without ending quote. 0 = odd quote means last quote is in token by itself along with everything after it. Next parse puts everything in a
 //// string until the first quote is met.
 /////// example: !0 = "test" "test" "est => "est
