@@ -1,19 +1,25 @@
 #include "parse.h"
+#include "strarr.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 
-static int ind_blk, tab_val, dec_start, singleqt_str, doubleqt_str, esc_char_non_str, last_qt_str, whitespc, bgn_chars_in_wd;
+static int  ind_blk, tab_val, dec_start, singleqt_str, doubleqt_str, esc_char_non_str, last_qt_str, whitespc, bgn_chars_in_wd;
 static char esc_char;
-static int last_qt_unend;
+static int  last_qt_unend;
 static char *wd_chars, *bgn_chars, *begend_chars, *ender_chars;
+static char closing_char;
 
 // position variables
-static int token_loc; // int to know where in token the parser is
-static int current_token; // int to know where in token_set to store the value of *token
-static int token_str_loc; // int to know where in token_str the parser is
+static int  token_loc; // int to know where in token the parser is
+static int  current_token; // int to know where in token_set to store the value of *token
+static int  token_str_loc; // int to know where in token_str the parser is
 static char lack_str;
+static int  missing_chars_loc
+
+// strings not static to be used outside file
+char *missing_chars;
 
 void parser_init(
     int   indent_block, /**/
@@ -49,6 +55,7 @@ void parser_init(
     if (last_qt_str) {
         last_qt_unend = 0;
     }
+    *missing_chars = (char *) malloc(sizeof(char)); // string to hold characters that need to be added to end the line.
 }
 
 /* !!!!!DO LATER (AFTER DONE WITH LANGUAGE)!!!!!
@@ -118,6 +125,7 @@ int tokenize(char ***token_set, const char *token_str, const char *error, const 
 {
     int i;
     int ret_val = 0;
+    int missing_chars_loc = 0;
     // freeing token_set
     for (i = 0; ; i++) {
         if (*(*token_set + i) == NULL) {
@@ -128,6 +136,8 @@ int tokenize(char ***token_set, const char *token_str, const char *error, const 
         }
     }
     free(*token_set);
+    free(missing_chars);
+    closing_char = '';
 
     // allocating token_set
     *token_set = (char **) malloc (sizeof(char *));
@@ -139,6 +149,12 @@ int tokenize(char ***token_set, const char *token_str, const char *error, const 
     // allocating token
     char *token = (char *) malloc(sizeof(char)); // string to store current token
     if (token == NULL) {
+        puts(error); // print error
+        exit(error_code); // exit with error code
+    }
+
+    *missing_chars = (char *) malloc(sizeof(char)); // string to hold characters that need to be added to end the line.
+    if (missing_chars == NULL) {
         puts(error); // print error
         exit(error_code); // exit with error code
     }
@@ -342,7 +358,6 @@ int tokenize(char ***token_set, const char *token_str, const char *error, const 
                 token_loc++;
                 token_str_loc++;
             }
-        } else if (strchr(begend_chars, *(token_str + token_str_loc))) {
         } else if (*(token_str + token_str_loc) == '\"') { // if next character is a double quote
             if (doubleqt_str && dquote_amnt != 1) { // if double quotes start and end a string
                 token = (char *) realloc(token, sizeof(char) * (token_loc + 2));
@@ -473,6 +488,31 @@ int tokenize(char ***token_set, const char *token_str, const char *error, const 
                     token_str_loc++;
                 }
             }
+        } else if (strchr(begend_chars, *(token_str + token_str_loc))) {
+            char *ret  = strchr(begend_chars, *(token_str + token_str_loc));
+            int index = (int) (ret - begend_chars);
+            missing_chars = (char *) realloc(missing_chars, sizeof(char) * missing_chars_loc + 2);
+            if (missing_chars == NULL) {
+                puts(error);
+                exit(error_code);
+            }
+
+            char temp_str[missing_chars_loc + 2];
+            temp_str[0] = ender_chars[index];
+            strcat(temp_str, missing_chars);
+            strcpy(missing_chars, temp_str);
+            missing_chars_loc++;
+            closing_char = ender_chars[index];
+        } else if (*(token_str + token_str_loc) == closing_char) {
+            cpy_sub_str(missing_chars, missing_chars, 1, strlen(missing_chars));
+            missing_chars_loc--;
+            missing_chars = (char *) realloc(missing_chars, sizeof(char) * missing_chars_loc + 2);
+            if (missing_chars == NULL) {
+                puts(error);
+                exit(error_code);
+            }
+
+            closing_char = missing_chars[0];
         } else if (ispunct(*(token_str + token_str_loc))) { // if next character is a non-quote symbol
             token = (char *) realloc(token, sizeof(char) * (token_loc + 2));
             if (token == NULL) {
@@ -853,6 +893,31 @@ int tokenize_append(char ***token_set, const char *token_str, const char *error,
                     token_str_loc++;
                 }
             }
+        } else if (strchr(begend_chars, *(token_str + token_str_loc))) {
+            char *ret  = strchr(begend_chars, *(token_str + token_str_loc));
+            int index = (int) (ret - begend_chars);
+            missing_chars = (char *) realloc(missing_chars, sizeof(char) * missing_chars_loc + 2);
+            if (missing_chars == NULL) {
+                puts(error);
+                exit(error_code);
+            }
+
+            char temp_str[missing_chars_loc + 2];
+            temp_str[0] = ender_chars[index];
+            strcat(temp_str, missing_chars);
+            strcpy(missing_chars, temp_str);
+            missing_chars_loc++;
+            closing_char = ender_chars[index];
+        } else if (*(token_str + token_str_loc) == closing_char) {
+            cpy_sub_str(missing_chars, missing_chars, 1, strlen(missing_chars));
+            missing_chars_loc--;
+            missing_chars = (char *) realloc(missing_chars, sizeof(char) * missing_chars_loc + 2);
+            if (missing_chars == NULL) {
+                puts(error);
+                exit(error_code);
+            }
+
+            closing_char = missing_chars[0];
         } else if (ispunct(*(token_str + token_str_loc))) { // if next character is a non-quote symbol
             token = (char *) realloc(token, sizeof(char) * (token_loc + 2));
             if (token == NULL) {

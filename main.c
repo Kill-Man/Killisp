@@ -9,17 +9,17 @@ const int MAJOR_VERSION = 0;
 const int MINOR_VERSION = 0;
 const int PATCH_VERSION = 2;
 
+extern char *missing_chars;
+
 int main(int argc, char **argv)
 {
     // strings and str arrs used to parse
     char  *line          = (char *)  malloc(sizeof(char)); // String to hold the line from a file or input string.
     char **toks          = (char **) malloc(sizeof(char *)); // Array of strings to hold the individual tokens of *line.
-    char  *missing_chars = (char *)  malloc(sizeof(char)); // string to hold characters that need to be added to end the line.
 
     int i;
     *toks = (char *) malloc(sizeof(char));
     *toks = NULL; // needed in order to use tokenize
-    strcpy(missing_chars, "");
     printf("Killisp v%d.%d.%d\n", MAJOR_VERSION, MINOR_VERSION, PATCH_VERSION);
     parser_init(
         0,
