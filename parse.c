@@ -16,7 +16,7 @@ static int  token_loc; // int to know where in token the parser is
 static int  current_token; // int to know where in token_set to store the value of *token
 static int  token_str_loc; // int to know where in token_str the parser is
 static char lack_str;
-static int  missing_chars_loc
+static int  missing_chars_loc;
 
 // strings not static to be used outside file
 char *missing_chars;
@@ -55,7 +55,7 @@ void parser_init(
     if (last_qt_str) {
         last_qt_unend = 0;
     }
-    *missing_chars = (char *) malloc(sizeof(char)); // string to hold characters that need to be added to end the line.
+    missing_chars = (char *) malloc(sizeof(char)); // string to hold characters that need to be added to end the line.
 }
 
 /* !!!!!DO LATER (AFTER DONE WITH LANGUAGE)!!!!!
@@ -137,7 +137,7 @@ int tokenize(char ***token_set, const char *token_str, const char *error, const 
     }
     free(*token_set);
     free(missing_chars);
-    closing_char = '';
+    closing_char = '\0';
 
     // allocating token_set
     *token_set = (char **) malloc (sizeof(char *));
@@ -153,7 +153,7 @@ int tokenize(char ***token_set, const char *token_str, const char *error, const 
         exit(error_code); // exit with error code
     }
 
-    *missing_chars = (char *) malloc(sizeof(char)); // string to hold characters that need to be added to end the line.
+    missing_chars = (char *) malloc(sizeof(char)); // string to hold characters that need to be added to end the line.
     if (missing_chars == NULL) {
         puts(error); // print error
         exit(error_code); // exit with error code
